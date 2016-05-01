@@ -1,3 +1,4 @@
+
 #include <TinyGPS++.h>
 #include <SoftwareSerial.h>
 /*
@@ -28,27 +29,24 @@ void setup()
 
 void loop()
 {
-  //printFloat(gps.location.lat(), gps.location.isValid(), 11, 6);
-  //printFloat(gps.location.lng(), gps.location.isValid(), 12, 6);
-
   Serial.println();
   
   smartDelay(1000);
 
   if (gps.location.isValid()) {
-    SubmitHttpRequest(gps.location.lat(),gps.location.lng());
-    Serial.print("Issiusta: ");
-    Serial.println(gps.location.lat());
-    Serial.println(gps.location.lng());
+      SubmitHttpRequest(gps.location.lat(), gps.location.lng());
+  //  Serial.print("Issiusta: ");
+  //  Serial.println(gps.location.lat());
+  //  Serial.println(gps.location.lng());
   }
 
-  if (Serial.available())
+/*  if (Serial.available())
    switch(Serial.read())
   {
     case 'h':
       SubmitHttpRequest(40.687157,22.279652);
       break;
-  } 
+  } */
  if (gprsSS.available())
    Serial.write(gprsSS.read());
 }
@@ -65,7 +63,7 @@ static void smartDelay(unsigned long ms)
   } while (millis() - start < ms);
 }
 
-static void printFloat(float val, bool valid, int len, int prec)
+/*static void printFloat(float val, bool valid, int len, int prec)
 {
   if (!valid)
   {
@@ -83,14 +81,34 @@ static void printFloat(float val, bool valid, int len, int prec)
       Serial.print(' ');
   }
   smartDelay(0);
-}
+}*/
+
 
 void SubmitHttpRequest(double lat, double lng)
 {
+  //float to string conversion
+  char charVallat[10];
+  char charVallng[9];
+  String slat = "";
+  String slng = "";
+    
+  dtostrf(lat, 4, 6, charVallat);
+  dtostrf(lng, 4, 6, charVallng);
+
+    //convert chararray to string
+  for(int i=0;i<sizeof(charVallat)-1;i++)
+  {
+    slat+=charVallat[i];
+  }
+  for(int i=0;i<sizeof(charVallng);i++)
+  {
+    slng+=charVallng[i];
+  }
+    
   String URL = "http://sarkyb.stud.if.ktu.lt/semestrinis/receiver.php?lat=";
-  URL += (double)lat;
+  URL += slat;
   URL += "&long=";
-  URL += (double)lng;
+  URL += slng;
  gprsSS.println("AT+CSQ");
  delay(50);
  ShowSerialData();// this code is to show the data from gprs shield, in order to easily see the process of how the gprs shield submit a http request, and the following is for this purpose too.
@@ -110,6 +128,7 @@ void SubmitHttpRequest(double lat, double lng)
  delay(1000); 
  ShowSerialData();
  gprsSS.println("AT+HTTPPARA=\"URL\",\"" + URL + "\"");// setting the httppara, the second parameter is the website you want to access
+ Serial.print(URL);
  delay(500);
  ShowSerialData();
  gprsSS.println("AT+HTTPACTION=0");//submit the request 
@@ -126,4 +145,3 @@ void ShowSerialData()
  while(gprsSS.available()!=0)
    Serial.write(gprsSS.read());
 }
-
