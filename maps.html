@@ -12,13 +12,51 @@
       }
       #map {
         height: 100%;
+		float: left;
+		width: 80%;
       }
+	  .page-right {
+	    width: 20%;
+		float: right;
+		padding: 15px;
+		padding-top: 150px;
+	  }
+	  .control-buttons {
+	    width: 204px;
+		margin: 0 auto;
+	  }
+	  .commands {
+	    margin-top: 30px;
+	  }
+	  .full-width {
+	    width: 100%;
+	  }
+	  .admin-user-controls {
+	    margin-top: 30px;
+	  }
     </style>
 	<script src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
   </head>
   <body>
-  <div><button onclick="start()">Pradėti</button><button onclick="stop()">Stabdyti</button><span id="busena"></span></div>
     <div id="map"></div>
+	<div class="page-right">
+	  <div class="control-buttons">
+	    <button type="button" class="btn btn-success btn-lg control-button-start full-width" onclick="start()">Pradėti</button>
+	    <button type="button" class="btn btn-danger btn-lg control-button-stop full-width" onclick="stop()">Stabdyti</button><span id="busena" style="display: none"><p class="text-uppercase">Veikia...</p></span>
+	  </div>
+	  <div class="commands">
+	    <h4>Valdymo komandos:</h4>
+	    <button type="button" data-loading-text="Vykdoma..." class="btn btn-primary command-button full-width" autocomplete="off">Komanda 1</button><br>
+	    <button type="button" data-loading-text="Vykdoma..." class="btn btn-primary command-button full-width" autocomplete="off">Komanda 2</button><br>
+	    <button type="button" data-loading-text="Vykdoma..." class="btn btn-primary command-button full-width" autocomplete="off">Komanda 3</button><br>
+	  </div>
+	  <div class="admin-user-controls">
+	    <button type="button" class="btn btn-primary full-width">Vartotojų sąrašas</button>
+	  </div>
+	</div>
+	  
     <script>
       var map;
 	  var marker;
@@ -44,7 +82,10 @@
 	  if (intervalas)
 	    return;
 	  intervalas = window.setInterval(function() { atnaujinti(); }, atnaujinimoIntervalas);
-	  $('#busena').text('Veikia...');
+	  disableElement($('.control-button-start'));
+	  enableElement($('.control-button-stop'));
+	  $('#busena').show();
+	  
 	  map.setZoom(20);
 	}
 	function stop() {
@@ -54,7 +95,19 @@
 	  window.clearInterval(intervalas);
 	  intervalas = null;
 	  map.setZoom(8);
-	  $('#busena').text('');
+	  $('#busena').hide();
+	  enableElement($('.control-button-start'));
+	  disableElement($('.control-button-stop'));
+	}
+	function disableElement(element) {
+	  if (!element)
+	    return;
+	  element.attr('disabled', 'disabled');
+	}
+	function enableElement(element) {
+	  if (!element)
+	    return;
+	  element.removeAttr('disabled');
 	}
 	function atnaujinti() {
 	$.ajax({url: "coordinates.txt",
@@ -69,7 +122,19 @@
 		laikasPaskutinis = laikas;
     }, cache: false});
 	}
-	  
+	$(document).ready(function() {
+	  disableElement($('.control-button-stop'));
+	});
+	var commandsContainer = $('.commands');
+	commandsContainer.find('.command-button').on('click', function() {
+	  var $btn = $(this).button('loading');
+	  disableElement(commandsContainer.find('.command-button'));
+      setTimeout(function() { 
+	    enableElement(commandsContainer.find('.command-button'));
+	    $btn.button('reset');
+	  }, 5000);
+      
+	});
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAqKVybk5Y9IhI9m7DrUONCYD2T5uKpP4&callback=initMap" async defer></script>
   </body>
