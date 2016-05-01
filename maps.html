@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sekimo projektas</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 100%;
+      }
+    </style>
+	<script src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
+  </head>
+  <body>
+  <div><button onclick="start()">Pradėti</button><button onclick="stop()">Stabdyti</button><span id="busena"></span></div>
+    <div id="map"></div>
+    <script>
+      var map;
+	  var marker;
+      function initMap() {
+	    var startLatLng = {lat: 54.89687210, lng: 23.89242640};
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: startLatLng,
+          zoom: 8
+        });
+		marker = new google.maps.Marker({
+          position: startLatLng,
+          map: map,
+          title: 'Dabartinė pozicija'
+        });
+      }
+	var intervalas;
+	var atnaujinimoIntervalas = 3000;
+	var laikas;
+	var lat;
+	var lng;
+	var laikasPaskutinis = 0;
+	function start() {
+	  if (intervalas)
+	    return;
+	  intervalas = window.setInterval(function() { atnaujinti(); }, atnaujinimoIntervalas);
+	  $('#busena').text('Veikia...');
+	  map.setZoom(20);
+	}
+	function stop() {
+	  if (!intervalas)
+	    return;
+	
+	  window.clearInterval(intervalas);
+	  intervalas = null;
+	  map.setZoom(8);
+	  $('#busena').text('');
+	}
+	function atnaujinti() {
+	$.ajax({url: "coordinates.txt",
+	success: function( duomenys ) {
+        laikas = parseInt(duomenys.slice(0, duomenys.indexOf(" ")));
+		if (laikas == laikasPaskutinis)
+		  return;
+		lat = parseFloat(duomenys.slice(duomenys.indexOf(" ") + 1, duomenys.lastIndexOf(" ")));
+		lng = parseFloat(duomenys.slice(duomenys.lastIndexOf(" ") + 1));
+		map.panTo({lat: lat, lng: lng});
+		marker.setPosition({lat: lat, lng: lng});
+		laikasPaskutinis = laikas;
+    }, cache: false});
+	}
+	  
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAqKVybk5Y9IhI9m7DrUONCYD2T5uKpP4&callback=initMap" async defer></script>
+  </body>
+</html>
