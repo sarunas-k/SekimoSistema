@@ -1,10 +1,9 @@
 ﻿CREATE TABLE users
 (
-        id integer NOT NULL AUTO_INCREMENT,
 	name varchar (255) NOT NULL,
 	password varchar (255) NOT NULL,
 	permission varchar (255) NOT NULL,
-	PRIMARY KEY(id)
+	PRIMARY KEY(name)
 );
 
 
