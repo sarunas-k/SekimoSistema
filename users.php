@@ -11,12 +11,16 @@ class user {
     public function __construct() {
     }
     
-    public function getUser($id) {
+    public function getUser($username, $password) {
          $query = " SELECT *
-                                     FROM `users`
-                                     WHERE `name`='{$id}'";
+                                     FROM `SP_users`
+                                     WHERE `name`='{$username}'
+									 AND `password`='{$password}'";
          $data = mysql::select($query);
          
+		 if (is_null($data[0]))
+			 return null;
+		 
          return $data[0];
      }
      
@@ -31,7 +35,7 @@ class user {
          }
          
          $query = " SELECT *
-                                     FROM `users`" . $limitOffsetString;
+                                     FROM `SP_users`" . $limitOffsetString;
          $data = mysql::select($query);
          
          return $data;
@@ -39,22 +43,22 @@ class user {
      
      public function getUsersListCount() {
          $query = " SELECT COUNT(`name`) as `kiekis`
-                                     FROM `users`";
+                                     FROM `SP_users`";
          $data = mysql::select($query);
          
          return $data[0]['kiekis'];
      }
      
      public function deleteUser($id) {
-         $query = "DELETE FROM `users`
+         $query = "DELETE FROM `SP_users`
                                      WHERE `name`='{$id}'";
              mysql::query($query);
      }
      
      public function updateUser($data) {
-         $query = " UPDATE `users`
+         $query = " UPDATE `SP_users`
                                      SET `password`='{$data['password']}',
-                                         `permission`='{$data['permission']}',
+                                         `admin_rights`='{$data['admin_rights']}',
                                      WHERE `name`='{$data['name']}'";
                                      
      
@@ -63,17 +67,17 @@ class user {
      
      
      public function insertUser($data) {
-         $query = " INSERT INTO `users`
+         $query = " INSERT INTO `SP_users`
                                      (
                                          `name`,
                                          `password`,
-                                         `permission`
+                                         `admin_rights`
                                      )
                                      VALUES
                                      (
                                          '{$data['name']}',
                                          '{$data['password']}',
-                                         '{$data['permission']}'
+                                         '{$data['admin_rights']}'
                                      )";
          mysql::query($query);
      }
