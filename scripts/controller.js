@@ -1,4 +1,4 @@
-var MapsController = (function () {
+﻿var MapsController = (function () {
     function MapsController() {
         this.refreshTime = 3000; //ms
         this.coordinatesFile = 'coordinates.txt';
