@@ -12,15 +12,16 @@
   <body>
     <div id="map"></div>
 	<div class="page-right">
+	  <textarea class="form-control console" rows="15" readonly></textarea>
 	  <div class="control-buttons">
 	    <button type="button" class="btn btn-success btn-lg control-button-start full-width" onclick="mapsController.start()">Pradėti</button>
-	    <button type="button" class="btn btn-danger btn-lg control-button-stop full-width" onclick="mapsController.stop()">Stabdyti</button><span id="busena" style="display: none"><p class="text-uppercase">Veikia...</p></span>
+	    <button type="button" class="btn btn-danger btn-lg control-button-stop full-width" onclick="mapsController.stop()">Stabdyti</button>
 	  </div>
 	  <div class="commands">
 	    <h4>Valdymo komandos:</h4>
-	    <button type="button" data-loading-text="Vykdoma..." class="btn btn-primary command-button full-width" autocomplete="off">Komanda 1</button><br>
-	    <button type="button" data-loading-text="Vykdoma..." class="btn btn-primary command-button full-width" autocomplete="off">Komanda 2</button><br>
-	    <button type="button" data-loading-text="Vykdoma..." class="btn btn-primary command-button full-width" autocomplete="off">Komanda 3</button><br>
+	    <button type="button" id="CMD01" data-loading-text="Vykdoma..." class="btn btn-primary command-button full-width" autocomplete="off">Komanda 1</button><br>
+	    <button type="button" id="CMD02" data-loading-text="Vykdoma..." class="btn btn-primary command-button full-width" autocomplete="off">Komanda 2</button><br>
+	    <button type="button" id="CMD03" data-loading-text="Vykdoma..." class="btn btn-primary command-button full-width" autocomplete="off">Komanda 3</button><br>
 	  </div>
 	  <div class="admin-user-controls">
 	    <button type="button" class="btn btn-primary full-width">Vartotojų sąrašas</button>
