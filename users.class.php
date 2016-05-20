@@ -11,17 +11,13 @@ class user {
     public function __construct() {
     }
     
-    public function getUser($username, $password) {
-         $query = " SELECT *
+    public function getUserRights($username, $password) {
+         $query = " SELECT `SP_users`.`admin_rights`
                                      FROM `SP_users`
                                      WHERE `name`='{$username}'
-									 AND `password`='{$password}'";
+				      AND `password`='{$password}'";
          $data = mysql::select($query);
-         
-		 if (is_null($data[0]))
-			 return null;
-		 
-         return $data[0];
+         return $data[0]['admin_rights'];
      }
      
      public function getUsersList($limit = null, $offset = null) {
@@ -42,6 +38,7 @@ class user {
      }
      
      public function getUsersListCount() {
+
          $query = " SELECT COUNT(`name`) as `kiekis`
                                      FROM `SP_users`";
          $data = mysql::select($query);

@@ -1,18 +1,8 @@
-﻿CREATE TABLE users
+﻿CREATE TABLE SP_users
 (
 	name varchar (255) NOT NULL,
 	password varchar (255) NOT NULL,
-	permission varchar (255) NOT NULL,
+	admin_rights boolean NOT NULL,
 	PRIMARY KEY(name)
 );
-
-
-CREATE TABLE permtypes
-(
-	id integer NOT NULL AUTO_INCREMENT,
-	name char (12) NOT NULL,
-	PRIMARY KEY(id)
-);
-INSERT INTO permtypes(id, name) VALUES(1, 'admin');
-INSERT INTO permtypes(id, name) VALUES(2, 'guest');
 
