@@ -1,3 +1,23 @@
+<?php
+session_start();
+$isAdmin = isset($_SESSION['admin_user']);
+$isGuest = isset($_SESSION['guest_user']);
+if(!$isAdmin && !$isGuest)
+	header('location: login.php');
+
+$action = '';
+if(isset($_GET['action'])) {
+	$action = $_GET['action'];
+}
+
+if($action == 'logout') {
+	if($isAdmin)
+		unset($_SESSION['admin_user']);
+	if($isGuest)
+		unset($_SESSION['guest_user']);
+	header('location: login.php');
+}
+?>
 <!DOCTYPE html>
 <html>
   <head>
@@ -17,6 +37,7 @@
 	    <button type="button" class="btn btn-success btn-lg control-button-start full-width" onclick="mapsController.start()">Pradėti</button>
 	    <button type="button" class="btn btn-danger btn-lg control-button-stop full-width" onclick="mapsController.stop()">Stabdyti</button>
 	  </div>
+	  <?php if($isAdmin) { ?>
 	  <div class="commands">
 	    <h4>Valdymo komandos:</h4>
 	    <button type="button" id="CMD01" data-loading-text="Vykdoma..." class="btn btn-primary command-button full-width" autocomplete="off">Komanda 1</button><br>
@@ -26,6 +47,8 @@
 	  <div class="admin-user-controls">
 	    <button type="button" class="btn btn-primary full-width">Vartotojų sąrašas</button>
 	  </div>
+	  <?php } ?>
+	  <a href="maps.php?action=logout" class="btn btn-primary full-width" style="margin-top: 50px;">Atsijungti</a>
 	</div>
 	  
     <script src="scripts/controller.js"></script>

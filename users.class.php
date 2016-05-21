@@ -15,7 +15,7 @@ class user {
          $query = " SELECT `SP_users`.`admin_rights`
                                      FROM `SP_users`
                                      WHERE `name`='{$username}'
-				      AND `password`='{$password}'";
+				      AND `password`=SHA1('{$password}')";
          $data = mysql::select($query);
          return $data[0]['admin_rights'];
      }
@@ -54,7 +54,7 @@ class user {
      
      public function updateUser($data) {
          $query = " UPDATE `SP_users`
-                                     SET `password`='{$data['password']}',
+                                     SET `password`=SHA1('{$data['password']}'),
                                          `admin_rights`='{$data['admin_rights']}',
                                      WHERE `name`='{$data['name']}'";
                                      
@@ -73,7 +73,7 @@ class user {
                                      VALUES
                                      (
                                          '{$data['name']}',
-                                         '{$data['password']}',
+                                         SHA1('{$data['password']}'),
                                          '{$data['admin_rights']}'
                                      )";
          mysql::query($query);

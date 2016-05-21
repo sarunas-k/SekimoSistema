@@ -21,10 +21,10 @@
 
       // If result "== 1" means "admin", "== 0"	means "guest", else error
       if($result == "1") {
-         $_SESSION['login_user'] = $myusername;
+         $_SESSION['admin_user'] = $myusername;
          header("location: http://sarkyb.stud.if.ktu.lt/semestrinis/maps.php");
       } else if($result == "0") {
-         $_SESSION['login_user'] = $myusername;
+         $_SESSION['guest_user'] = $myusername;
          header("location: http://sarkyb.stud.if.ktu.lt/semestrinis/maps.php");
       } else {
          $error = "Your Login Name or Password is invalid!";
