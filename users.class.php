@@ -45,6 +45,13 @@ class user {
          
          return $data[0]['kiekis'];
      }
+	 
+	 public function getUser($id) {
+         $query = "SELECT * FROM `SP_users`
+                                     WHERE `name`='{$id}'";
+         $data = mysql::select($query);
+		 return $data[0];
+     }
      
      public function deleteUser($id) {
          $query = "DELETE FROM `SP_users`
@@ -55,7 +62,16 @@ class user {
      public function updateUser($data) {
          $query = " UPDATE `SP_users`
                                      SET `password`=SHA1('{$data['password']}'),
-                                         `admin_rights`='{$data['admin_rights']}',
+                                         `admin_rights`='{$data['admin_rights']}'
+                                     WHERE `name`='{$data['name']}'";
+                                     
+     
+         mysql::query($query);
+     }
+	 
+	 public function updateUserRights($data) {
+         $query = " UPDATE `SP_users`
+                                     SET `admin_rights`='{$data['admin_rights']}',
                                      WHERE `name`='{$data['name']}'";
                                      
      

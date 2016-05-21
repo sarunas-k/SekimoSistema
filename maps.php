@@ -45,7 +45,7 @@ if($action == 'logout') {
 	    <button type="button" id="CMD03" data-loading-text="Vykdoma..." class="btn btn-primary command-button full-width" autocomplete="off">Komanda 3</button><br>
 	  </div>
 	  <div class="admin-user-controls">
-	    <button type="button" class="btn btn-primary full-width">Vartotojų sąrašas</button>
+	    <a href="users_list.php" class="btn btn-primary full-width" target="_blank">Vartotojų sąrašas</a>
 	  </div>
 	  <?php } ?>
 	  <a href="maps.php?action=logout" class="btn btn-primary full-width" style="margin-top: 50px;">Atsijungti</a>

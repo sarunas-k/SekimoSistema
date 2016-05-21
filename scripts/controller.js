@@ -2,7 +2,7 @@ var MapsController = (function () {
     function MapsController() {
         this.refreshTime = 3000; //ms
         this.coordinatesFile = 'coordinates.txt';
-        this.commandSetURL = 'https://sarkyb.stud.if.ktu.lt/semestrinis/receiver.php?cmd=';
+        this.commandSetURL = 'http://sarkyb.stud.if.ktu.lt/semestrinis/receiver.php?cmd=';
         this.disableElement($('.control-button-stop'));
         this.initCommands();
     }
@@ -11,6 +11,8 @@ var MapsController = (function () {
             return;
         this.date = new Date();
         var hours = this.date.getHours().toString();
+        if (hours.length === 1)
+            hours = "0" + hours;
         var minutes = this.date.getMinutes().toString();
         if (minutes.length === 1)
             minutes = "0" + minutes;
@@ -88,10 +90,16 @@ var MapsController = (function () {
                 _this.previousTimestamp = _this.currentTimestamp;
                 _this.log("Nauja vietos informacija:" + "platuma: " + lat + ", ilguma: " + lng);
             },
-            error: function () {
-                _this.log("Nepavyko susijungti su serveriu");
+            error: function (jqXHR, textStatus, errorThrown) {
+                if (textStatus === "timeout") {
+                    _this.log("Serveris neatsako");
+                }
+                else {
+                    _this.log("Nepavyko susijungti su serveriu");
+                }
             },
-            cache: false
+            cache: false,
+            timeout: 3000
         });
     };
     MapsController.prototype.initCommands = function () {

@@ -6,7 +6,7 @@
     private currentTimestamp: number;
     private previousTimestamp: number;
     private coordinatesFile: string = 'coordinates.txt';
-    private commandSetURL: string = 'https://sarkyb.stud.if.ktu.lt/semestrinis/receiver.php?cmd=';
+    private commandSetURL: string = 'http://sarkyb.stud.if.ktu.lt/semestrinis/receiver.php?cmd=';
     private date: Date;
 
     constructor() {
@@ -20,6 +20,8 @@
 
         this.date = new Date();
         var hours: string = this.date.getHours().toString();
+        if (hours.length === 1)
+            hours = "0" + hours;
         var minutes: string = this.date.getMinutes().toString();
         if (minutes.length === 1)
             minutes = "0" + minutes;
@@ -105,10 +107,15 @@
                 this.previousTimestamp = this.currentTimestamp;
                 this.log("Nauja vietos informacija:" + "platuma: " + lat + ", ilguma: " + lng);
             },
-            error: () => {
-                this.log("Nepavyko susijungti su serveriu");
+            error: (jqXHR, textStatus, errorThrown) => {
+                if (textStatus === "timeout") {
+                    this.log("Serveris neatsako");
+                } else {
+                    this.log("Nepavyko susijungti su serveriu");
+                }
             },
-            cache: false
+            cache: false,
+            timeout: 3000
         });
     }
 
