@@ -10,7 +10,7 @@
 
 static const int RXPin = 10, TXPin = 11; //GPS module pins
 static const int GPSBaud = 19200; //GPS baud rate
-static bool OnOff = true; //if GPRS shield is turned off, make it false
+bool OnOff = true; //if GPRS shield is turned off, make it false
 SoftwareSerial gprsSS(7, 8); //GPRS shield pins
 
 // The TinyGPS++ object
@@ -31,11 +31,14 @@ void setup()
 
 void loop()
 {
+     ss.listen();
    if(OnOff == true) { //if GPRS shield is turned on, send http request, if not do nothing
      Serial.println();
      smartDelay(1000);
+     gps.encode(ss.read());
      if (gps.location.isValid()) 
      SubmitHttpRequest(gps.location.lat(), gps.location.lng());
+     Serial.println(" ");
    }
 }
 
@@ -81,7 +84,7 @@ void SubmitHttpRequest(double lat, double lng)
   URL += "&long=";
   URL += slng;
 
- gprsSS.listen();
+ gprsSS.listen(); //listening for gprs serial
   
  gprsSS.println("AT+CSQ");
  delay(50);
