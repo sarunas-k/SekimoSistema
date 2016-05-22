@@ -8,10 +8,21 @@
     private coordinatesFile: string = 'coordinates.txt';
     private commandSetURL: string = 'http://sarkyb.stud.if.ktu.lt/semestrinis/receiver.php?cmd=';
     private date: Date;
+    private autoScrollDown: boolean;
+    private consoleContainer: JQuery;
 
     constructor() {
         this.disableElement($('.control-button-stop'));
         this.initCommands();
+        this.consoleContainer = $('.console-container');
+        this.initConsoleAutoScroll();
+    }
+
+    private initConsoleAutoScroll(): void {
+        $(document).ready(() => { this.autoScrollDown = this.consoleContainer.find('.auto-scroll').is(':checked'); });
+        this.consoleContainer.find('.auto-scroll').on('change', (event) => {
+            this.autoScrollDown = $(event.currentTarget).is(':checked');
+        });
     }
 
     private log(text: string): void {
@@ -32,7 +43,10 @@
         var $console = $(".console");
         $console.append(currentTime + text + "\n");
 
+        if (!this.autoScrollDown)
+            return;
         // automatiškai nuvažiuoja į apačią
+        var $console = this.consoleContainer.find('.console');
         $console[0].scrollTop = $console[0].scrollHeight - $console.height();
     }
 
@@ -123,26 +137,26 @@
         var commandsContainer = $('.commands');
         var commandButtons = commandsContainer.find('.command-button');
         commandButtons.on('click', (event) => {
-            var element = event.currentTarget;
-            var cmd: string = $(element).attr('id');
+            var element = $(event.currentTarget);
+            var cmd: string = element.attr('id');
             if (!cmd.trim().length) {
                 this.log("Mygtukas neturi nustatytos komandos");
                 return;
             }
-            var $btn = $(element).button('loading');
+            var $btn = element.button('loading');
             this.disableElement(commandButtons);
             setTimeout(() => {
                 this.enableElement(commandButtons);
                 $btn.button('reset');
             }, 5000);
-            this.log("Siunčiama komanda vykdymui: " + cmd);
+            this.log("Siunčiama komanda vykdymui: " + element.text());
             $.ajax({
                 url: this.commandSetURL + cmd,
                 success: (data) => {
                     this.log("Komanda sėkmingai išsiųsta");
                 },
                 error: () => {
-                    alert("Komandos išsiųsti nepavyko");
+                    this.log("Komandos išsiųsti nepavyko");
                 },
                 cache: false
             });

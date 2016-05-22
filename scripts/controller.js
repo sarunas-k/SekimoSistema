@@ -5,7 +5,16 @@ var MapsController = (function () {
         this.commandSetURL = 'http://sarkyb.stud.if.ktu.lt/semestrinis/receiver.php?cmd=';
         this.disableElement($('.control-button-stop'));
         this.initCommands();
+        this.consoleContainer = $('.console-container');
+        this.initConsoleAutoScroll();
     }
+    MapsController.prototype.initConsoleAutoScroll = function () {
+        var _this = this;
+        $(document).ready(function () { _this.autoScrollDown = _this.consoleContainer.find('.auto-scroll').is(':checked'); });
+        this.consoleContainer.find('.auto-scroll').on('change', function (event) {
+            _this.autoScrollDown = $(event.currentTarget).is(':checked');
+        });
+    };
     MapsController.prototype.log = function (text) {
         if (!text.length)
             return;
@@ -22,7 +31,10 @@ var MapsController = (function () {
         var currentTime = "[" + hours + ":" + minutes + ":" + seconds + "] ";
         var $console = $(".console");
         $console.append(currentTime + text + "\n");
+        if (!this.autoScrollDown)
+            return;
         // automatiškai nuvažiuoja į apačią
+        var $console = this.consoleContainer.find('.console');
         $console[0].scrollTop = $console[0].scrollHeight - $console.height();
     };
     MapsController.prototype.initMap = function () {
@@ -107,26 +119,26 @@ var MapsController = (function () {
         var commandsContainer = $('.commands');
         var commandButtons = commandsContainer.find('.command-button');
         commandButtons.on('click', function (event) {
-            var element = event.currentTarget;
-            var cmd = $(element).attr('id');
+            var element = $(event.currentTarget);
+            var cmd = element.attr('id');
             if (!cmd.trim().length) {
                 _this.log("Mygtukas neturi nustatytos komandos");
                 return;
             }
-            var $btn = $(element).button('loading');
+            var $btn = element.button('loading');
             _this.disableElement(commandButtons);
             setTimeout(function () {
                 _this.enableElement(commandButtons);
                 $btn.button('reset');
             }, 5000);
-            _this.log("Siunčiama komanda vykdymui: " + cmd);
+            _this.log("Siunčiama komanda vykdymui: " + element.text());
             $.ajax({
                 url: _this.commandSetURL + cmd,
                 success: function (data) {
                     _this.log("Komanda sėkmingai išsiųsta");
                 },
                 error: function () {
-                    alert("Komandos išsiųsti nepavyko");
+                    _this.log("Komandos išsiųsti nepavyko");
                 },
                 cache: false
             });

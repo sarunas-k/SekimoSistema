@@ -32,7 +32,11 @@ if($action == 'logout') {
   <body>
     <div id="map"></div>
 	<div class="page-right">
-	  <textarea class="form-control console" rows="15" readonly></textarea>
+	  <div class="console-container">
+	    <textarea class="form-control console" rows="15" readonly></textarea>
+	    <label for="auto-scroll">Atnaujinus nuvesti žemyn</label>
+	    <input type="checkbox" class="auto-scroll" name="auto-scroll" checked />
+	  </div>
 	  <div class="control-buttons">
 	    <button type="button" class="btn btn-success btn-lg control-button-start full-width" onclick="mapsController.start()">Pradėti</button>
 	    <button type="button" class="btn btn-danger btn-lg control-button-stop full-width" onclick="mapsController.stop()">Stabdyti</button>
@@ -40,9 +44,9 @@ if($action == 'logout') {
 	  <?php if($isAdmin) { ?>
 	  <div class="commands">
 	    <h4>Valdymo komandos:</h4>
-	    <button type="button" id="CMD01" data-loading-text="Vykdoma..." class="btn btn-primary command-button full-width" autocomplete="off">Komanda 1</button><br>
-	    <button type="button" id="CMD02" data-loading-text="Vykdoma..." class="btn btn-primary command-button full-width" autocomplete="off">Komanda 2</button><br>
-	    <button type="button" id="CMD03" data-loading-text="Vykdoma..." class="btn btn-primary command-button full-width" autocomplete="off">Komanda 3</button><br>
+	    <button type="button" id="CMD01" data-loading-text="Vykdoma..." class="btn btn-primary command-button full-width" autocomplete="off">Įrenginio sustabdymas</button><br>
+	    <button type="button" id="CMD02" data-loading-text="Vykdoma..." class="btn btn-primary command-button full-width" autocomplete="off">Žalias LED</button><br>
+	    <button type="button" id="CMD03" data-loading-text="Vykdoma..." class="btn btn-primary command-button full-width" autocomplete="off">Raudonas LED</button><br>
 	  </div>
 	  <div class="admin-user-controls">
 	    <a href="users_list.php" class="btn btn-primary full-width" target="_blank">Vartotojų sąrašas</a>
