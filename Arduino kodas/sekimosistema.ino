@@ -35,7 +35,6 @@ void loop()
    if(OnOff == true) { //if GPRS shield is turned on, send http request, if not do nothing
      Serial.println();
      smartDelay(1000);
-     gps.encode(ss.read());
      if (gps.location.isValid()) 
      SubmitHttpRequest(gps.location.lat(), gps.location.lng());
      Serial.println(" ");
@@ -124,7 +123,6 @@ void ShowSerialData()
      // Serial.print(inChar[i]);
       i++; 
     }
-    
    // Serial.print("\n");
     for(int j=0; j<i; j++)
     {
@@ -132,10 +130,26 @@ void ShowSerialData()
       
       //"8365866968" == "SAVED" in dec
       //"6777684849" == "CMD01" in dec -> "AT+CPOWD=1" -> GPRS shut down
+      //"6777684850" == "CMD02" in dec -> pin 13 high, pin 12 low -> GREEN led on
+      //"6777684851" == "CMD03" in dec -> pin 12 high, pin 13 low -> RED led on
+      
       //IF found "CMD01" in decimal code, the GPRS shield is turned off
       if(data == "6777684849") {
         gprsSS.println("AT+CPOWD=1"); // turning off GPRS shield 
         OnOff = false; // turning off http requests for GPRS shield
+      }
+
+      pinMode(12, OUTPUT);
+      pinMode(13, OUTPUT);
+      //IF found "CMD02" in decimal code, turning on green led
+      if(data == "6777684850") {
+        digitalWrite(13, HIGH); // turning green led on
+        digitalWrite(12, LOW); // turning red led off
+      }
+      //IF found "CMD03" in decimal code, turning on red led
+      if(data == "6777684851") {
+        digitalWrite(12, HIGH); // turning red led on
+        digitalWrite(13, LOW); // turning green led off
       }
       // INPUT OTHER COMMANDS HERE ----------------------------------------------------------
     } 
