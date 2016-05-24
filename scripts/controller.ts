@@ -10,11 +10,13 @@
     private date: Date;
     private autoScrollDown: boolean;
     private consoleContainer: JQuery;
+    private content: JQuery;
 
-    constructor() {
-        this.disableElement($('.control-button-stop'));
+    constructor(content: JQuery) {
+        this.content = content;
+        this.disableElement(content.find('.control-button-stop'));
         this.initCommands();
-        this.consoleContainer = $('.console-container');
+        this.consoleContainer = content.find('.console-container');
         this.initConsoleAutoScroll();
     }
 
@@ -30,30 +32,36 @@
             return;
 
         this.date = new Date();
-        var hours: string = this.date.getHours().toString();
-        if (hours.length === 1)
-            hours = "0" + hours;
-        var minutes: string = this.date.getMinutes().toString();
-        if (minutes.length === 1)
-            minutes = "0" + minutes;
-        var seconds: string = this.date.getSeconds().toString();
-        if (seconds.length === 1)
-            seconds = "0" + seconds;
-        var currentTime: string = "[" + hours + ":" + minutes + ":" + seconds + "] ";
-        var $console = $(".console");
+        var currentTime = this.getPrettyDate(this.date);
+        var $console = this.consoleContainer.find('.console');
         $console.append(currentTime + text + "\n");
 
         if (!this.autoScrollDown)
             return;
         // automatiškai nuvažiuoja į apačią
-        var $console = this.consoleContainer.find('.console');
         $console[0].scrollTop = $console[0].scrollHeight - $console.height();
+    }
+
+    public getPrettyDate(date: Date): string {
+        if (!date)
+            return;
+
+        var hours: string = date.getHours().toString();
+        if (hours.length === 1)
+            hours = "0" + hours;
+        var minutes: string = date.getMinutes().toString();
+        if (minutes.length === 1)
+            minutes = "0" + minutes;
+        var seconds: string = date.getSeconds().toString();
+        if (seconds.length === 1)
+            seconds = "0" + seconds;
+        return "[" + hours + ":" + minutes + ":" + seconds + "] ";
     }
 
     public initMap(): void {
         this.log("Užkraunamas žemėlapis");
         var startLatLng = { lat: 54.89687210, lng: 23.89242640 };
-        this.map = new google.maps.Map(document.getElementById('map'), {
+        this.map = new google.maps.Map(this.content.find('#map')[0], {
             center: startLatLng,
             zoom: 8
         });
@@ -72,8 +80,8 @@
 
         this.log("Programa pradeda darbą");
         this.intervalas = window.setInterval(() => this.refresh(), this.refreshTime);
-        this.disableElement($('.control-button-start'));
-        this.enableElement($('.control-button-stop'));
+        this.disableElement(this.content.find('.control-button-start'));
+        this.enableElement(this.content.find('.control-button-stop'));
 
         this.map.setZoom(20);
     }
@@ -88,8 +96,8 @@
         window.clearInterval(this.intervalas);
         this.intervalas = null;
         this.map.setZoom(8);
-        this.enableElement($('.control-button-start'));
-        this.disableElement($('.control-button-stop'));
+        this.enableElement(this.content.find('.control-button-start'));
+        this.disableElement(this.content.find('.control-button-stop'));
     }
 
     private disableElement(element): void {
@@ -109,17 +117,16 @@
         $.ajax({
             url: this.coordinatesFile,
             success: (data) => {
-                this.currentTimestamp = parseInt(data.slice(0, data.indexOf(" ")));
+                var coordinates: ICoordinates = this.parseCoordinates(data);
+                this.currentTimestamp = coordinates.timestamp;
                 if (this.currentTimestamp == this.previousTimestamp) {
                     this.log("Naujų koordinačių nėra");
                     return;
                 }
-                var lat = parseFloat(data.slice(data.indexOf(" ") + 1, data.lastIndexOf(" ")));
-                var lng = parseFloat(data.slice(data.lastIndexOf(" ") + 1));
-                this.map.panTo({ lat: lat, lng: lng });
-                this.marker.setPosition({ lat: lat, lng: lng });
+                this.map.panTo({ lat: coordinates.lat, lng: coordinates.lng });
+                this.marker.setPosition({ lat: coordinates.lat, lng: coordinates.lng });
                 this.previousTimestamp = this.currentTimestamp;
-                this.log("Nauja vietos informacija:" + "platuma: " + lat + ", ilguma: " + lng);
+                this.log("Nauja vietos informacija:" + "platuma: " + coordinates.lat + ", ilguma: " + coordinates.lng);
             },
             error: (jqXHR, textStatus, errorThrown) => {
                 if (textStatus === "timeout") {
@@ -133,13 +140,29 @@
         });
     }
 
+    public parseCoordinates(data: string): ICoordinates {
+        if (!data)
+            return;
+
+        var timestamp: number = parseInt(data.slice(0, data.indexOf(" ")));
+        var lat = parseFloat(data.slice(data.indexOf(" ") + 1, data.lastIndexOf(" ")));
+        var lng = parseFloat(data.slice(data.lastIndexOf(" ") + 1));
+
+        return {
+            timestamp: timestamp,
+            lat: lat,
+            lng: lng
+        };
+    }
+
+    
+
     private initCommands(): void {
-        var commandsContainer = $('.commands');
-        var commandButtons = commandsContainer.find('.command-button');
+        var commandButtons = this.content.find('.commands .command-button');
         commandButtons.on('click', (event) => {
             var element = $(event.currentTarget);
             var cmd: string = element.attr('id');
-            if (!cmd.trim().length) {
+            if (!cmd) {
                 this.log("Mygtukas neturi nustatytos komandos");
                 return;
             }
@@ -164,5 +187,9 @@
         });
     }
 }
-
-var mapsController: MapsController = new MapsController();
+interface ICoordinates {
+    lat: number;
+    lng: number;
+    timestamp: number;
+}
+var mapsController: MapsController = new MapsController($('.maps-content'));

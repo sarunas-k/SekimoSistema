@@ -30,31 +30,32 @@ if($action == 'logout') {
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
   </head>
   <body>
-    <div id="map"></div>
-	<div class="page-right">
-	  <div class="console-container">
-	    <textarea class="form-control console" rows="15" readonly></textarea>
-	    <label for="auto-scroll">Atnaujinus nuvesti žemyn</label>
-	    <input type="checkbox" class="auto-scroll" name="auto-scroll" checked />
+    <div class="maps-content" style="height: 100%">
+      <div id="map"></div>
+	  <div class="page-right">
+	    <div class="console-container">
+	      <textarea class="form-control console" rows="15" readonly></textarea>
+	      <label for="auto-scroll">Atnaujinus nuvesti žemyn</label>
+	      <input type="checkbox" class="auto-scroll" name="auto-scroll" checked />
+	    </div>
+	    <div class="control-buttons">
+	      <button type="button" class="btn btn-success btn-lg control-button-start full-width" onclick="mapsController.start()">Pradėti</button>
+	      <button type="button" class="btn btn-danger btn-lg control-button-stop full-width" onclick="mapsController.stop()">Stabdyti</button>
+	    </div>
+	    <?php if($isAdmin) { ?>
+	    <div class="commands">
+	      <h4>Valdymo komandos:</h4>
+	      <button type="button" id="CMD01" data-loading-text="Vykdoma..." class="btn btn-primary command-button full-width" autocomplete="off">Įrenginio sustabdymas</button><br>
+	      <button type="button" id="CMD02" data-loading-text="Vykdoma..." class="btn btn-primary command-button full-width" autocomplete="off">Žalias LED</button><br>
+	      <button type="button" id="CMD03" data-loading-text="Vykdoma..." class="btn btn-primary command-button full-width" autocomplete="off">Raudonas LED</button><br>
+	    </div>
+	    <div class="admin-user-controls">
+	      <a href="users_list.php" class="btn btn-primary full-width" target="_blank">Vartotojų sąrašas</a>
+	    </div>
+	    <?php } ?>
+	    <a href="maps.php?action=logout" class="btn btn-primary full-width" style="margin-top: 50px;">Atsijungti</a>
 	  </div>
-	  <div class="control-buttons">
-	    <button type="button" class="btn btn-success btn-lg control-button-start full-width" onclick="mapsController.start()">Pradėti</button>
-	    <button type="button" class="btn btn-danger btn-lg control-button-stop full-width" onclick="mapsController.stop()">Stabdyti</button>
-	  </div>
-	  <?php if($isAdmin) { ?>
-	  <div class="commands">
-	    <h4>Valdymo komandos:</h4>
-	    <button type="button" id="CMD01" data-loading-text="Vykdoma..." class="btn btn-primary command-button full-width" autocomplete="off">Įrenginio sustabdymas</button><br>
-	    <button type="button" id="CMD02" data-loading-text="Vykdoma..." class="btn btn-primary command-button full-width" autocomplete="off">Žalias LED</button><br>
-	    <button type="button" id="CMD03" data-loading-text="Vykdoma..." class="btn btn-primary command-button full-width" autocomplete="off">Raudonas LED</button><br>
-	  </div>
-	  <div class="admin-user-controls">
-	    <a href="users_list.php" class="btn btn-primary full-width" target="_blank">Vartotojų sąrašas</a>
-	  </div>
-	  <?php } ?>
-	  <a href="maps.php?action=logout" class="btn btn-primary full-width" style="margin-top: 50px;">Atsijungti</a>
 	</div>
-	  
     <script src="scripts/controller.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAqKVybk5Y9IhI9m7DrUONCYD2T5uKpP4&callback=mapsController.initMap" async defer></script>
   </body>

@@ -1,11 +1,12 @@
 var MapsController = (function () {
-    function MapsController() {
+    function MapsController(content) {
         this.refreshTime = 3000; //ms
         this.coordinatesFile = 'coordinates.txt';
         this.commandSetURL = 'http://sarkyb.stud.if.ktu.lt/semestrinis/receiver.php?cmd=';
-        this.disableElement($('.control-button-stop'));
+        this.content = content;
+        this.disableElement(content.find('.control-button-stop'));
         this.initCommands();
-        this.consoleContainer = $('.console-container');
+        this.consoleContainer = content.find('.console-container');
         this.initConsoleAutoScroll();
     }
     MapsController.prototype.initConsoleAutoScroll = function () {
@@ -19,28 +20,32 @@ var MapsController = (function () {
         if (!text.length)
             return;
         this.date = new Date();
-        var hours = this.date.getHours().toString();
-        if (hours.length === 1)
-            hours = "0" + hours;
-        var minutes = this.date.getMinutes().toString();
-        if (minutes.length === 1)
-            minutes = "0" + minutes;
-        var seconds = this.date.getSeconds().toString();
-        if (seconds.length === 1)
-            seconds = "0" + seconds;
-        var currentTime = "[" + hours + ":" + minutes + ":" + seconds + "] ";
-        var $console = $(".console");
+        var currentTime = this.getPrettyDate(this.date);
+        var $console = this.consoleContainer.find('.console');
         $console.append(currentTime + text + "\n");
         if (!this.autoScrollDown)
             return;
         // automatiškai nuvažiuoja į apačią
-        var $console = this.consoleContainer.find('.console');
         $console[0].scrollTop = $console[0].scrollHeight - $console.height();
+    };
+    MapsController.prototype.getPrettyDate = function (date) {
+        if (!date)
+            return;
+        var hours = date.getHours().toString();
+        if (hours.length === 1)
+            hours = "0" + hours;
+        var minutes = date.getMinutes().toString();
+        if (minutes.length === 1)
+            minutes = "0" + minutes;
+        var seconds = date.getSeconds().toString();
+        if (seconds.length === 1)
+            seconds = "0" + seconds;
+        return "[" + hours + ":" + minutes + ":" + seconds + "] ";
     };
     MapsController.prototype.initMap = function () {
         this.log("Užkraunamas žemėlapis");
         var startLatLng = { lat: 54.89687210, lng: 23.89242640 };
-        this.map = new google.maps.Map(document.getElementById('map'), {
+        this.map = new google.maps.Map(this.content.find('#map')[0], {
             center: startLatLng,
             zoom: 8
         });
@@ -58,8 +63,8 @@ var MapsController = (function () {
         }
         this.log("Programa pradeda darbą");
         this.intervalas = window.setInterval(function () { return _this.refresh(); }, this.refreshTime);
-        this.disableElement($('.control-button-start'));
-        this.enableElement($('.control-button-stop'));
+        this.disableElement(this.content.find('.control-button-start'));
+        this.enableElement(this.content.find('.control-button-stop'));
         this.map.setZoom(20);
     };
     MapsController.prototype.stop = function () {
@@ -71,8 +76,8 @@ var MapsController = (function () {
         window.clearInterval(this.intervalas);
         this.intervalas = null;
         this.map.setZoom(8);
-        this.enableElement($('.control-button-start'));
-        this.disableElement($('.control-button-stop'));
+        this.enableElement(this.content.find('.control-button-start'));
+        this.disableElement(this.content.find('.control-button-stop'));
     };
     MapsController.prototype.disableElement = function (element) {
         if (!element)
@@ -90,17 +95,16 @@ var MapsController = (function () {
         $.ajax({
             url: this.coordinatesFile,
             success: function (data) {
-                _this.currentTimestamp = parseInt(data.slice(0, data.indexOf(" ")));
+                var coordinates = _this.parseCoordinates(data);
+                _this.currentTimestamp = coordinates.timestamp;
                 if (_this.currentTimestamp == _this.previousTimestamp) {
                     _this.log("Naujų koordinačių nėra");
                     return;
                 }
-                var lat = parseFloat(data.slice(data.indexOf(" ") + 1, data.lastIndexOf(" ")));
-                var lng = parseFloat(data.slice(data.lastIndexOf(" ") + 1));
-                _this.map.panTo({ lat: lat, lng: lng });
-                _this.marker.setPosition({ lat: lat, lng: lng });
+                _this.map.panTo({ lat: coordinates.lat, lng: coordinates.lng });
+                _this.marker.setPosition({ lat: coordinates.lat, lng: coordinates.lng });
                 _this.previousTimestamp = _this.currentTimestamp;
-                _this.log("Nauja vietos informacija:" + "platuma: " + lat + ", ilguma: " + lng);
+                _this.log("Nauja vietos informacija:" + "platuma: " + coordinates.lat + ", ilguma: " + coordinates.lng);
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 if (textStatus === "timeout") {
@@ -114,14 +118,25 @@ var MapsController = (function () {
             timeout: 3000
         });
     };
+    MapsController.prototype.parseCoordinates = function (data) {
+        if (!data)
+            return;
+        var timestamp = parseInt(data.slice(0, data.indexOf(" ")));
+        var lat = parseFloat(data.slice(data.indexOf(" ") + 1, data.lastIndexOf(" ")));
+        var lng = parseFloat(data.slice(data.lastIndexOf(" ") + 1));
+        return {
+            timestamp: timestamp,
+            lat: lat,
+            lng: lng
+        };
+    };
     MapsController.prototype.initCommands = function () {
         var _this = this;
-        var commandsContainer = $('.commands');
-        var commandButtons = commandsContainer.find('.command-button');
+        var commandButtons = this.content.find('.commands .command-button');
         commandButtons.on('click', function (event) {
             var element = $(event.currentTarget);
             var cmd = element.attr('id');
-            if (!cmd.trim().length) {
+            if (!cmd) {
                 _this.log("Mygtukas neturi nustatytos komandos");
                 return;
             }
@@ -146,4 +161,4 @@ var MapsController = (function () {
     };
     return MapsController;
 })();
-var mapsController = new MapsController();
+var mapsController = new MapsController($('.maps-content'));
